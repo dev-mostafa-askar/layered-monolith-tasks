@@ -40,7 +40,6 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function configureRateLimiting(): void
     {
-
         RateLimiter::for('task-create', function (Request $request) {
             return Limit::perMinute(5)->by(optional($request->user())->id ?: $request->ip());
         });
