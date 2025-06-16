@@ -24,7 +24,7 @@ Route::prefix('v1')->group(function (Router $route) {
 
     $route->prefix('tasks')->middleware('auth:api')->group(function () use ($route) {
         $route->get('/', [TaskController::class, 'index']);
-        $route->post('/', [TaskController::class, 'create']);
+        $route->post('/', [TaskController::class, 'create'])->middleware('throttle:task-create');
         $route->put('/{id}', [TaskController::class, 'update']);
         $route->patch('/{id}', [TaskController::class, 'updateTaskStatus']);
         $route->delete('/{id}', [TaskController::class, 'delete']);
