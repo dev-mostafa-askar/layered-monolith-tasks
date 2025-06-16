@@ -51,6 +51,6 @@ class TaskController extends Controller
     public function delete($taskId)
     {
         $this->taskService->delete($taskId);
-        return responder()->success(['message' => 'Task deleted successfully'])->respond(Response::HTTP_OK);
+        return responder()->success(['message' => 'Task deleted successfully'])->respond(Response::HTTP_NO_CONTENT);
     }
 }
