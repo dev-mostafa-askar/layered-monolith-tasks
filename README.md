@@ -6,10 +6,8 @@ This project implements a task management API using Laravel, following a monolit
 
 1. Features
 2. Architectural Decisions
-3. Installation
-4. Running Reminders Cron Job
-5. Contributing
-6. License
+3. Contributing
+4. License
 
 ## **Features**
 
