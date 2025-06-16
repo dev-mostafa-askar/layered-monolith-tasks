@@ -1,66 +1,98 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# **Laravel Task management Project**
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This project implements a task management API using Laravel, following a monolith architecture with layered principles (Controller \-\> Service \-\> Repository) and Data Transfer Objects (DTOs) for data handling.
 
-## About Laravel
+## **Table of Contents**
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+1. Features
+2. Architectural Decisions
+3. Installation
+4. Running Reminders Cron Job
+5. Contributing
+6. License
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## **Features**
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+-   **User Authentication:** Secure sign-up and sign-in with API token protection.
+-   **Task Management:**
+    -   CRUD (Create, Read, Update, Delete) operations for tasks.
+    -   Soft Deletion for tasks.
+    -   Listing tasks with **filters** and **full-text search**.
+-   **Rate Limiting:** Protects the task creation endpoint (`/api/v1/tasks`) against abuse.
+-   **Task Reminders:**
+    -   Sends email reminders to users 24 hours before a task's due date.
+    -   Utilizes Laravel's **queue jobs** for asynchronous email sending.
+    -   Automated via a **cron job** to run every hour.
 
-## Learning Laravel
+## **Architectural Decisions**
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+This project follows specific architectural patterns and data handling strategies for maintainability, scalability, and efficiency.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### **Layered Architecture (Controller \-\> Service \-\> Repository)**
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+The application adheres to a layered architecture, specifically:
 
-## Laravel Sponsors
+-   **Controllers:** Handle incoming HTTP requests, validate input (using Form Requests), and delegate business logic to the Service layer. They are primarily responsible for request/response handling.
+-   **Services:** Contain the core business logic. They orchestrate operations involving multiple repositories or complex data transformations, ensuring that controllers remain thin and focused on HTTP.
+-   **Repositories:** Abstract the data persistence layer. They are responsible for interacting directly with the database (e.g., using Eloquent) and providing methods for data retrieval and storage, decoupling the business logic from the database implementation details.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+**Why this approach?** This separation of concerns enhances:
 
-### Premium Partners
+-   **Maintainability:** Each layer has a single responsibility, making the codebase easier to understand, debug, and modify.
+-   **Testability:** Individual layers can be tested in isolation (e.g., unit testing services without needing a database connection).
+-   **Flexibility:** Database implementation can be changed (e.g., from MySQL to PostgreSQL) with minimal impact on the Service or Controller layers.
+-   **Scalability:** Clear boundaries facilitate identifying performance bottlenecks and potentially scaling specific layers.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+### **Monolith Architecture**
 
-## Contributing
+The project is structured as a monolith.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+**Why this approach?**
 
-## Code of Conduct
+-   **Simplicity:** Easier to develop, deploy, and manage for smaller to medium-sized applications.
+-   **Unified Development:** All code resides in one codebase, simplifying dependency management and team coordination.
+-   **Performance:** Direct function calls within the same process generally have lower latency compared to inter-service communication in microservices.
+-   **Initial Velocity:** Faster to get a new project off the ground.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+While microservices offer benefits for large-scale, distributed systems, a well-structured monolith like this provides a solid foundation that can be refactored into microservices later if complexity or scale demands it.
 
-## Security Vulnerabilities
+### **Data Transfer Objects (DTOs)**
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+DTOs are used to transfer data between the Controller, Service, and Repository layers.
 
-## License
+**Why use DTOs?**
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+-   **Type Safety and Readability:** Provide a clear, type-hinted structure for data, improving code readability and reducing runtime errors.
+-   **Reduced Over-fetching/Under-fetching:** Allow precise definition of the data required at each layer, preventing unnecessary data transfer.
+-   **Decoupling:** Decouple internal domain models from external API representations or request structures, protecting the internal model from changes in external interfaces.
+-   **Clarity:** Clearly define the input and output contracts for methods in services and repositories.
+
+### **Usage of Enums**
+
+Enums are utilized for fixed sets of values, such as task statuses (e.g., `pending`, `completed`).
+
+**Why use Enums?**
+
+-   **Improved Readability:** Self-documenting code as the purpose of values is explicit.
+-   **Type Safety:** Prevents invalid values from being assigned, reducing bugs.
+-   **Maintainability:** Easier to manage a predefined set of options in one place.
+
+### **Storing Integers in Database for Enums (Minimizing Database Storage)**
+
+Instead of storing raw string values for enums (e.g., 'completed', 'pending') directly in the database, their corresponding integer representations (e.g., 0 for 'pending', 1 for 'completed') are stored.
+
+**Why this approach?**
+
+-   **Database Storage Efficiency:** Integers consume significantly less storage space than strings, especially for frequently occurring values, leading to smaller database files and potentially faster backups/restores.
+-   **Performance:** Indexing and querying integer columns are generally faster than string columns.
+-   **Consistency:** Ensures data consistency and avoids typos that can occur with string-based enum values.
+
+The mapping between integers and their string representations is handled in the application layer (e.g., using Laravel's native Enum casting or custom accessors/mutators), keeping the database optimized while providing human-readable values in the application.
+
+## **Contributing**
+
+Feel free to contribute by opening issues or submitting pull requests.
+
+## **License**
+
+This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
