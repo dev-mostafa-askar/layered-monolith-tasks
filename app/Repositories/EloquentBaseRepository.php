@@ -43,4 +43,9 @@ abstract class EloquentBaseRepository implements BaseRepository
     {
         return $this->model->select($columns);
     }
+
+    public function buildQuery()
+    {
+        return $this->model->query();
+    }
 }

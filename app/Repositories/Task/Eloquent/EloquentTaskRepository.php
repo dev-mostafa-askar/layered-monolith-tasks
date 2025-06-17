@@ -9,16 +9,16 @@ use App\DTOs\Task\UpdateTaskDto;
 use App\DTOs\Task\UpdateTaskStatusDto;
 use App\Enums\TaskStatusEnum;
 use App\Models\Task;
+use App\Repositories\EloquentBaseRepository;
 use App\Repositories\Task\TaskRepository;
+use Illuminate\Database\Eloquent\Collection;
 
-class EloquentTaskRepository implements TaskRepository
+class EloquentTaskRepository extends EloquentBaseRepository implements TaskRepository
 {
 
-    public function __construct(private Task $task) {}
-
-    public function ListAllTasks(ListTaskDto $taskDto)
+    public function ListAllTasks(ListTaskDto $taskDto): Collection
     {
-        $query = $this->task->query()->where('user_id', auth()->id());
+        $query = $this->buildQuery()->where('user_id', auth()->id());
 
         if ($taskDto->getSearch()) {
             $query->fullTextSearch($taskDto->getSearch());
@@ -54,9 +54,9 @@ class EloquentTaskRepository implements TaskRepository
 
         return $tasks;
     }
-    public function create(CreateTaskDto $taskDto)
+    public function createTask(CreateTaskDto $taskDto): TaskDto
     {
-        $task = $this->task->create([
+        $task = $this->create([
             'title' => $taskDto->getTitle(),
             'description' => $taskDto->getDescription(),
             'date' => $taskDto->getDate(),
@@ -66,9 +66,9 @@ class EloquentTaskRepository implements TaskRepository
         ]);
         return TaskDto::fromModel($task);
     }
-    public function update(UpdateTaskDto $taskDto)
+    public function updateTask(UpdateTaskDto $taskDto): TaskDto
     {
-        $task = $this->task->findOrFail($taskDto->getTaskId());
+        $task = $this->find($taskDto->getTaskId());
         $task->update([
             'title' => $taskDto->getTitle(),
             'description' => $taskDto->getDescription(),
@@ -79,25 +79,25 @@ class EloquentTaskRepository implements TaskRepository
         return TaskDto::fromModel($task);
     }
 
-    public function updateStatus(UpdateTaskStatusDto $taskDto)
+    public function updateStatus(UpdateTaskStatusDto $taskDto): TaskDto
     {
-        $task = $this->task->findOrFail($taskDto->getTaskId());
+        $task = $this->find($taskDto->getTaskId());
         $task->update([
             'status' => $taskDto->getStatus()->value
         ]);
         return TaskDto::fromModel($task);
     }
 
-    public function delete(int $taskId)
+    public function deleteTask(int $taskId): bool
     {
-        $task = $this->task->findOrFail($taskId);
+        $task = $this->find($taskId);
         $task->delete();
         return true;
     }
 
-    public function find(int $taskId)
+    public function findTask(int $taskId): TaskDto
     {
-        $task = $this->task->findOrFail($taskId);
+        $task = $this->find($taskId);
         return TaskDto::fromModel($task);
     }
 }

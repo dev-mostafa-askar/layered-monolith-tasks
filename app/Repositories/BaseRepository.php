@@ -14,4 +14,5 @@ interface BaseRepository
     public function update($id, array $data): bool;
     public function delete($id): bool;
     public function select(array $columns): Collection;
+    public function buildQuery();
 }

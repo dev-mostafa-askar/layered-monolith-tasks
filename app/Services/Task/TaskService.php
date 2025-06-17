@@ -22,12 +22,12 @@ class TaskService
 
     public function create(CreateTaskDto $createTaskDto)
     {
-        return $this->taskRepository->create($createTaskDto);
+        return $this->taskRepository->createTask($createTaskDto);
     }
 
     public function update(UpdateTaskDto $updateTaskDto)
     {
-        return $this->taskRepository->update($updateTaskDto);
+        return $this->taskRepository->updateTask($updateTaskDto);
     }
 
     public function updateStatus(UpdateTaskStatusDto $updateTaskStatusDto)
@@ -43,11 +43,11 @@ class TaskService
 
     public function delete(int $taskId)
     {
-        return $this->taskRepository->delete($taskId);
+        return $this->taskRepository->deleteTask($taskId);
     }
 
     public function find(int $taskId)
     {
-        return $this->taskRepository->find($taskId);
+        return $this->taskRepository->findTask($taskId);
     }
 }
